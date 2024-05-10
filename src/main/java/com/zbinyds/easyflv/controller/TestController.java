@@ -20,16 +20,10 @@ public class TestController {
     private final FlvHelper flvHelper;
 
     @GetMapping("/stream_{channel}.flv")
-    public void flv(@PathVariable String channel, @RequestParam Integer type,
+    public void flv(@PathVariable String channel, @RequestParam String url,
                     HttpServletRequest request, HttpServletResponse response) {
-        String url;
-        if (type == 1) {
-            url = "rtsp://admin:Aa123456@223.112.40.138:25082/Streaming/Channels/" + channel;
-        } else if (type == 2) {
-            url = "rtsp://admin:Aa123456@223.112.40.138:25182/Streaming/Channels/" + channel;
-        } else {
-            url = "rtsp://admin:Aa123456@223.112.40.138:16896/Streaming/Channels/" + channel;
-        }
+        // 示例 url = rtsp://192.168.1.1:554/Streaming/Channels/，channel = 1
+        url = url + channel;
         flvHelper.open(url, request, response);
     }
 }
