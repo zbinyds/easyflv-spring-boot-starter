@@ -14,18 +14,18 @@ import javax.servlet.http.HttpServletResponse;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/flv")
+@RequestMapping
 @RequiredArgsConstructor
-public class FlvController {
+public class TestController {
     private final FlvHelper flvHelper;
 
-    @GetMapping("/hls/stream_{channel}.flv")
-    public void hls(@PathVariable String channel, @RequestParam Integer type,
+    @GetMapping("/stream_{channel}.flv")
+    public void flv(@PathVariable String channel, @RequestParam Integer type,
                     HttpServletRequest request, HttpServletResponse response) {
         String url;
         if (type == 1) {
             url = "rtsp://admin:Aa123456@223.112.40.138:25082/Streaming/Channels/" + channel;
-        } else if (type == 2){
+        } else if (type == 2) {
             url = "rtsp://admin:Aa123456@223.112.40.138:25182/Streaming/Channels/" + channel;
         } else {
             url = "rtsp://admin:Aa123456@223.112.40.138:16896/Streaming/Channels/" + channel;

@@ -32,6 +32,10 @@ public class ConverterContext {
         CACHE.remove(key);
     }
 
+    public static Map<String, Converter> dumpAll() {
+        return CACHE;
+    }
+
     public static Converter generateAndRunning(String url, String key, AsyncContext context) {
         FFmpegFrameGrabber grabber = JavaCvUtil.createGrabber(url);
         if (avcodec.AV_CODEC_ID_H264 == grabber.getVideoCodec()

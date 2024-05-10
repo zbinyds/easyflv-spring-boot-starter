@@ -44,17 +44,16 @@ public class DefaultConverterThread extends AbstractConverter {
             log.info("url:[{}] DefaultConverterThread start", super.getUrl());
             avutil.av_log_set_level(avutil.AV_LOG_ERROR);
             recorder = JavaCvUtil.createRecorder(stream, grabber);
-
+            recorder.setAudioCodec(grabber.getAudioCodec());
+            recorder.setVideoCodec(grabber.getVideoCodec());
+            recorder.start(grabber.getFormatContext());
             if (super.getHeaders() == null) {
+                // rtsp流 头信息写入 转换器
                 super.setHeaders(stream.toByteArray());
                 stream.reset();
                 writeResponse(super.getOuts(), super.getHeaders());
             }
             int nullNumber = 0;
-            recorder.setAudioCodec(grabber.getAudioCodec());
-            recorder.setVideoCodec(grabber.getVideoCodec());
-            recorder.start(grabber.getFormatContext());
-
             while (isRunning) {
                 AVPacket k = grabber.grabPacket();
                 if (k != null) {
@@ -77,18 +76,18 @@ public class DefaultConverterThread extends AbstractConverter {
                     // 抓包失败次数达200次不等待默认退出
                     nullNumber++;
                     if (nullNumber > 200) {
-                        log.info("抓包失败达上限, 当前{}次", nullNumber);
+                        log.info("抓包失败达{}次上限, 可能由于网络波动", nullNumber);
                         break;
                     }
                 }
                 // 此处根据实际带宽调整，如果读流器一直抓包失败，可以考虑加长等待时间
-                Thread.sleep(10);
+                Thread.sleep(5);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
-            log.info("url:[{}] defaultConverter exit", super.getUrl());
-            safeClose(this.grabber, recorder, this.stream, super.getOuts(), super.getKey());
+            log.info("url:[{}] DefaultConverter exit", super.getUrl());
+            safeClose(this.grabber, recorder, this.stream, super.getOuts());
         }
     }
 }
