@@ -19,12 +19,13 @@ import java.io.IOException;
 @Slf4j
 @Service
 public class FlvHelperImpl implements FlvHelper {
-    private static final String CHECK_MATCH = "^rtsp://.*";
+    private static final String CHECK_MATCH = "^(rtsp|rtmp)://.*";
 
     @Override
-    public void open(String rtspUrl, HttpServletRequest request, HttpServletResponse response) {
-        String key = md5(rtspUrl);
-        if (null == key || !isValid(rtspUrl)) {
+    public void open(String url, HttpServletRequest request, HttpServletResponse response) {
+        String key = md5(url);
+        if (null == key || !isValid(url)) {
+            log.error("url不合法");
             return;
         }
         AsyncContext context = request.startAsync();
@@ -41,7 +42,7 @@ public class FlvHelperImpl implements FlvHelper {
             }
         } else {
             // 此url不存在，需要新建一个转换器
-            converter = ConverterContext.generateAndRunning(rtspUrl, key, context);
+            converter = ConverterContext.generateAndRunning(url, key, context);
             ConverterContext.register(key, converter);
         }
         // 设置响应头信息

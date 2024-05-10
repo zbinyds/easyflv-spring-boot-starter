@@ -1,6 +1,6 @@
-<!-- easyflv: Java RTSP to FLV Converter -->
+<!-- easyflv: Java RTSP/RTMP to FLV Converter -->
 
-# 📺 easyflv: 基于javacv实现的 rtsp 转 flv格式通用实现
+# 📺 easyflv: 基于javacv实现的 rtsp/rtmp 转 flv格式封装
 
 ## 🚀 快速开始
 
