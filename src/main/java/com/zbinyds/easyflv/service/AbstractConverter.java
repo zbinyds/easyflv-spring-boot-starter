@@ -2,6 +2,8 @@ package com.zbinyds.easyflv.service;
 
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.AsyncContext;
 import java.io.ByteArrayOutputStream;
@@ -15,6 +17,7 @@ import java.util.List;
  * @Create 2024-05-09 10:02
  */
 public abstract class AbstractConverter extends Thread implements Converter {
+    private static final Logger log = LoggerFactory.getLogger(AbstractConverter.class);
     public volatile boolean isRunning = true;
 
     /**

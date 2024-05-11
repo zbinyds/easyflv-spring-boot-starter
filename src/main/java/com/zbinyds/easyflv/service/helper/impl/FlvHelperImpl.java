@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * flv转换器helper，提供便捷的方法进行转换
+ *
  * @Author zbinyds
  * @Create 2024-05-08 14:43
  */

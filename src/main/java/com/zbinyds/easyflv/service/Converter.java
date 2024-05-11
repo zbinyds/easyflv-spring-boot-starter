@@ -1,15 +1,18 @@
 package com.zbinyds.easyflv.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.AsyncContext;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 
+/**
+ * 转换器抽象。<br />
+ * 思路是每个rtsp/rtmp流对应一个{@link Converter}实例，若有多个客户端同时播放同一个流，{@link Converter}实例中添加一个{@link AsyncContext}即可
+ *
+ * @Author zbinyds
+ * @Create 2024-05-08 14:43
+ */
 public interface Converter {
-    Logger log = LoggerFactory.getLogger(Converter.class);
 
     /**
      * 获取该转换的key

@@ -6,6 +6,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * flv-helper。提供了对于flv格式转换的便捷支持
+ *
  * @Author zbinyds
  * @Create 2024-05-08 14:42
  */

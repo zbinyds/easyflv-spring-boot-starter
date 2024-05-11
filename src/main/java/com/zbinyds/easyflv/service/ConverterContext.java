@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 转换器上下文。相当于本地缓存维度，提供了对于转换器对象的管理
+ *
  * @Author zbinyds
  * @Create 2024-05-08 14:38
  */
@@ -36,6 +38,14 @@ public class ConverterContext {
         return CACHE;
     }
 
+    /**
+     * 根据视频流格式，判断是否需要转码，然后创建对应的转换器
+     *
+     * @param url     待转换原始视频流（rtsp/rtmp）
+     * @param key     url 唯一标识（md5）
+     * @param context 当前客户端异步上下文
+     * @return 转换器
+     */
     public static Converter generateAndRunning(String url, String key, AsyncContext context) {
         FFmpegFrameGrabber grabber = JavaCvUtil.createGrabber(url);
         if (avcodec.AV_CODEC_ID_H264 == grabber.getVideoCodec()

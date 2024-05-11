@@ -18,6 +18,8 @@ public class JavaCvUtil {
         FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(url);
         grabber.setOption("rtsp_transport", "tcp");
         grabber.setOption("stimeout", "5000000");
+        // 若有必要可以限制请求方式为POST，但对应的接口请求方式也必须是POST
+//        grabber.setOption("method", "POST");
         grabber.start();
 
         return grabber;
