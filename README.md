@@ -29,7 +29,7 @@ implementation 'com.zbinyds.easyflv:easyflv-spring-boot-starter:您使用的版�
 
 在您的 Spring Boot 项目中
 
-1. 通过注解 `@EnableEasyflv` 开启 easyflv 模块;
+1. 方式一、通过注解 `@EnableEasyflv` 开启 easyflv 模块;
 
 ```java
 
@@ -43,7 +43,7 @@ public class Application {
 }
 ```
 
-2. 扩大包扫描范围，将 `com.zbinyds.easyflv` 包添加到 `@ComponentScan` 注解中。
+2. 方式二、扩大包扫描范围，将 `com.zbinyds.easyflv` 包添加到 `@ComponentScan` 注解中。
 
 ```java
 
@@ -77,7 +77,8 @@ public class FLVController {
 
 至此，您就可以通过您指定的请求，获取flv格式的视频流数据了。<br />
 例如上述示例代码，可以通过 `http://ip地址:端口号/flv/stream_1.flv` 获取视频流数据。<br />
-前端可直接借助flv.js播放视频流，也可以通过vlc播放器测试是否成功转换。
+前端可直接借助flv.js播放视频流，也可以通过vlc播放器测试是否成功转换。<br />
+实测，海康摄像头延迟在2-3s左右，具体和网络带宽有关
 
 ## 📄 效果图
 
