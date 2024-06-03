@@ -4,6 +4,7 @@ import com.zbinyds.easyflv.service.Converter;
 import com.zbinyds.easyflv.service.ConverterContext;
 import com.zbinyds.easyflv.service.helper.FlvHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.AsyncContext;
@@ -20,8 +21,14 @@ import java.io.IOException;
 
 @Slf4j
 @Service
-public class FlvHelperImpl implements FlvHelper {
+public class FlvHelperImpl implements FlvHelper, DisposableBean {
     private static final String CHECK_MATCH = "^(rtsp|rtmp)://.*";
+
+    @Override
+    public void destroy() {
+        log.debug("正在销毁Converter实例");
+        ConverterContext.dumpAll().forEach((key, converter) -> converter.exit());
+    }
 
     @Override
     public void open(String url, HttpServletRequest request, HttpServletResponse response) {

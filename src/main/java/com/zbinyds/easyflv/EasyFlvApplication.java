@@ -1,7 +1,5 @@
 package com.zbinyds.easyflv;
 
-import com.zbinyds.easyflv.service.ConverterContext;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,13 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 
 @SpringBootApplication
-public class EasyFlvApplication implements DisposableBean {
+public class EasyFlvApplication {
     public static void main(String[] args) {
         SpringApplication.run(EasyFlvApplication.class, args);
-    }
-
-    @Override
-    public void destroy() {
-        ConverterContext.dumpAll().forEach((key, converter) -> converter.exit());
     }
 }
