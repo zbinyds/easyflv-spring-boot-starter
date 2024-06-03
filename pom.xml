@@ -16,6 +16,7 @@
         <!-- 配置依赖版本 -->
         <lombok.version>1.18.24</lombok.version>
         <javacv.version>1.5.10</javacv.version>
+        <ffmpeg-platform.version>6.1.1-1.5.10</ffmpeg-platform.version>
     </properties>
 
     <build>
@@ -60,10 +61,21 @@
             <version>${lombok.version}</version>
         </dependency>
         <!-- javacv -->
+        <!--        &lt;!&ndash; javacv-平台依赖(过重) &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.bytedeco</groupId>-->
+        <!--            <artifactId>javacv-platform</artifactId>-->
+        <!--            <version>${javacv.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>javacv-platform</artifactId>
+            <artifactId>javacv</artifactId>
             <version>${javacv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>ffmpeg-platform</artifactId>
+            <version>${ffmpeg-platform.version}</version>
         </dependency>
     </dependencies>
 </project>
