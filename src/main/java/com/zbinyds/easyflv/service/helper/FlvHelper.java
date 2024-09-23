@@ -13,8 +13,21 @@ import java.security.NoSuchAlgorithmException;
  */
 public interface FlvHelper {
 
-    void open(String rtspUrl, HttpServletRequest request, HttpServletResponse response);
+    /**
+     * 开启flv转换
+     *
+     * @param url      rtsp/rtmp流地址
+     * @param request  请求体
+     * @param response 响应体
+     */
+    void open(String url, HttpServletRequest request, HttpServletResponse response);
 
+    /**
+     * md5加密
+     *
+     * @param plainText 明文
+     * @return 加密字符串
+     */
     default String md5(String plainText) {
         StringBuilder buf;
         try {
