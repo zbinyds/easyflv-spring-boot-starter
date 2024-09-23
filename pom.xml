@@ -8,6 +8,22 @@
     <artifactId>easyflv-spring-boot-starter</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <distributionManagement>
+        <!-- 私服地址配置
+          maven.settings文件需要配置私服账号密码, 如下:
+          <server>
+              <id>intranetRepo</id>
+              <username>username</username>
+              <password>password</password>
+          </server>
+          配置完成deploy即可
+          -->
+        <repository>
+            <id>intranetRepo</id>
+            <url>http://192.168.1.100:8081/repository/xxy-dev/</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
