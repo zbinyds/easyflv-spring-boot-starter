@@ -11,6 +11,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * flv转换器helper，提供便捷的方法进行转换
@@ -35,25 +36,36 @@ public class FlvHelperImpl implements FlvHelper, DisposableBean {
         String key = md5(url);
         if (null == key || !isValid(url)) {
             log.error("url不合法");
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        AsyncContext context = request.startAsync();
-        context.setTimeout(0);
+        // 通过converter实例进行转码操作
+        Optional.ofNullable(ConverterContext.getConverter(key))
+                .ifPresentOrElse(converter -> {
+                    // 此url已存在，被转换中，添加一个entity输出即可
+                    try {
+                        AsyncContext context = request.startAsync();
+                        context.setTimeout(0);
 
-        Converter converter = ConverterContext.getConverter(key);
-        if (null != converter) {
-            // 此url已存在，被转换中，添加一个entity输出即可
-            try {
-                converter.addOutputStreamEntity(key, context);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-                throw new IllegalArgumentException(e.getMessage());
-            }
-        } else {
-            // 此url不存在，需要新建一个转换器
-            converter = ConverterContext.generateAndRunning(url, key, context);
-            ConverterContext.register(key, converter);
-        }
+                        converter.addOutputStreamEntity(key, context);
+                    } catch (IOException e) {
+                        log.error(e.getMessage(), e);
+                        throw new IllegalArgumentException(e.getMessage());
+                    }
+                    afterSuccessConvert(response);
+                }, () -> {
+                    // 此url不存在，需要新建一个转换器
+                    Converter newConverter = ConverterContext.generateAndRunning(url, key, request);
+                    if (null == newConverter) {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        return;
+                    }
+                    ConverterContext.register(key, newConverter);
+                    afterSuccessConvert(response);
+                });
+    }
+
+    public void afterSuccessConvert(HttpServletResponse response) {
         // 设置响应头信息
         response.setContentType("video/x-flv");
         response.setHeader("Connection", "keep-alive");

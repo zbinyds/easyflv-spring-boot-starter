@@ -3,6 +3,8 @@ package com.zbinyds.easyflv.util;
 import lombok.SneakyThrows;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 
@@ -13,6 +15,7 @@ import java.io.ByteArrayOutputStream;
  * @Create 2024-05-08 15:47
  */
 public class JavaCvUtil {
+    private static final Logger log = LoggerFactory.getLogger(JavaCvUtil.class);
 
     /**
      * 创建抓图器并运行。
@@ -20,18 +23,20 @@ public class JavaCvUtil {
      * @param url 抓取地址源
      * @return {@link FFmpegFrameGrabber 抓图器}
      */
-    @SneakyThrows
     public static FFmpegFrameGrabber createGrabber(String url) {
-        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(url);
-        // 指定rtsp传输方式为tcp
-        grabber.setOption("rtsp_transport", "tcp");
-        // 指定超时时间为5s
-        grabber.setOption("stimeout", "5000000");
-        // 若有必要可以限制请求方式为POST，但对应的接口请求方式也必须是POST
-//        grabber.setOption("method", "POST");
-        grabber.start();
-
-        return grabber;
+        try {
+            FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(url);
+            grabber.setTimeout(5000);
+            grabber.setOption("rtsp_transport", "tcp");
+            grabber.setOption("stimeout", "5000000");
+            // 若有必要可以限制请求方式为POST，但对应的接口请求方式也必须是POST
+//            grabber.setOption("method", "POST");
+            grabber.start();
+            return grabber;
+        } catch (FFmpegFrameGrabber.Exception e) {
+            log.error("运行抓图器FFmpegFrameGrabber失败, error: {}", e.getMessage());
+            return null;
+        }
     }
 
     /**
