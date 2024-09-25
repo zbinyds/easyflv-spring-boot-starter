@@ -41,7 +41,7 @@ public class TranscodingConverterThread extends AbstractConverter {
     public void run() {
         FFmpegFrameRecorder recorder = null;
         try {
-            log.info("url:[{}] TranscodingConverterThread start", super.getUrl());
+            log.info("url:[{}], key:[{}] TranscodingConverterThread start", super.getUrl(), super.getKey());
             avutil.av_log_set_level(avutil.AV_LOG_ERROR);
             if (grabber.getImageWidth() > 1920) {
                 grabber.setImageWidth(1920);
@@ -95,7 +95,7 @@ public class TranscodingConverterThread extends AbstractConverter {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
-            log.info("url:[{}] TranscodingConverterThread exit", super.getUrl());
+            log.info("url:[{}], key:[{}] TranscodingConverterThread exit", super.getUrl(), super.getKey());
             safeClose(this.grabber, recorder, this.stream, super.getOuts());
         }
     }

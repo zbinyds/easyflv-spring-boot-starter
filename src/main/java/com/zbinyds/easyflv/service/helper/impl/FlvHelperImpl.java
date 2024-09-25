@@ -39,25 +39,22 @@ public class FlvHelperImpl implements FlvHelper, DisposableBean {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        // 开启异步执行
+        AsyncContext context = request.startAsync();
+        context.setTimeout(0);
+
         // 通过converter实例进行转码操作
         Optional.ofNullable(ConverterContext.getConverter(key))
                 .ifPresentOrElse(converter -> {
                     // 此url已存在，被转换中，添加一个entity输出即可
-                    try {
-                        AsyncContext context = request.startAsync();
-                        context.setTimeout(0);
-
-                        converter.addOutputStreamEntity(key, context);
-                    } catch (IOException e) {
-                        log.error(e.getMessage(), e);
-                        throw new IllegalArgumentException(e.getMessage());
-                    }
+                    converter.addOutputStreamEntity(context);
                     afterSuccessConvert(response);
                 }, () -> {
                     // 此url不存在，需要新建一个转换器
-                    Converter newConverter = ConverterContext.generateAndRunning(url, key, request);
+                    Converter newConverter = ConverterContext.generateAndRunning(url, key, context);
                     if (null == newConverter) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        // url资源不存在 | 线程池达上限, 拒绝转换
+                        afterFailConvert(response, context);
                         return;
                     }
                     ConverterContext.register(key, newConverter);
@@ -76,6 +73,12 @@ public class FlvHelperImpl implements FlvHelper, DisposableBean {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    public void afterFailConvert(HttpServletResponse response, AsyncContext context) {
+        // 关闭异步上下文并设置响应异常状态码
+        context.complete();
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     private static boolean isValid(String url) {

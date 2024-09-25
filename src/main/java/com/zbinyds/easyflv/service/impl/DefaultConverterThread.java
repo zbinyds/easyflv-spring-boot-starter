@@ -41,7 +41,7 @@ public class DefaultConverterThread extends AbstractConverter {
     public void run() {
         FFmpegFrameRecorder recorder = null;
         try {
-            log.info("url:[{}] DefaultConverterThread start", super.getUrl());
+            log.info("url:[{}], key:[{}] DefaultConverterThread start", super.getUrl(), super.getKey());
             avutil.av_log_set_level(avutil.AV_LOG_ERROR);
             recorder = JavaCvUtil.createRecorder(stream, grabber);
             recorder.setAudioCodec(grabber.getAudioCodec());
@@ -86,7 +86,7 @@ public class DefaultConverterThread extends AbstractConverter {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
-            log.info("url:[{}] DefaultConverter exit", super.getUrl());
+            log.info("url:[{}], key:[{}] DefaultConverter exit", super.getUrl(), super.getKey());
             safeClose(this.grabber, recorder, this.stream, super.getOuts());
         }
     }
