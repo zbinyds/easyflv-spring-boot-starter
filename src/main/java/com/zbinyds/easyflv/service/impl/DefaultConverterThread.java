@@ -32,9 +32,9 @@ public class DefaultConverterThread extends AbstractConverter {
      */
     private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-    public DefaultConverterThread(String key, String url, AsyncContext context) {
+    public DefaultConverterThread(String key, String url, AsyncContext context, FFmpegFrameGrabber grabber) {
         super(key, url, context);
-        this.grabber = JavaCvUtil.createGrabber(url);
+        this.grabber = grabber;
     }
 
     @Override
