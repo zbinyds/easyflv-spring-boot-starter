@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.AsyncContext;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -70,11 +69,17 @@ public abstract class AbstractConverter extends Thread implements Converter {
     }
 
     @Override
-    public void addOutputStreamEntity(String key, AsyncContext entity) throws IOException {
-        if (this.headers != null) {
-            // 如果有第二个客户端播放首先要返回头信息
-            entity.getResponse().getOutputStream().write(headers);
-            entity.getResponse().getOutputStream().flush();
+    public void addOutputStreamEntity(AsyncContext entity) {
+        try {
+            if (this.headers != null) {
+                // 如果有第二个客户端播放首先要返回头信息
+                entity.getResponse().getOutputStream().write(headers);
+                entity.getResponse().getOutputStream().flush();
+            }
+        } catch (Exception e) {
+            // 异常忽略此客户端播放
+            log.info("error msg: {}", e.getMessage(), e);
+            return;
         }
         outs.add(entity);
     }

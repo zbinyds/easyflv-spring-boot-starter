@@ -27,10 +27,9 @@ public interface Converter {
     /**
      * 添加一个流输出，相当于添加一个客户端播放视频流（一个rtsp流兼容多端播放的情况）
      *
-     * @param key    key
      * @param entity 客户端异步上下文
      */
-    void addOutputStreamEntity(String key, AsyncContext entity) throws IOException;
+    void addOutputStreamEntity(AsyncContext entity);
 
     /**
      * 退出转换
