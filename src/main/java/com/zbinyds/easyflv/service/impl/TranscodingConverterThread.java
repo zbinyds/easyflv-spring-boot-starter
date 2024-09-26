@@ -2,7 +2,6 @@ package com.zbinyds.easyflv.service.impl;
 
 import com.zbinyds.easyflv.service.AbstractConverter;
 import com.zbinyds.easyflv.util.JavaCvUtil;
-import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.ffmpeg.global.avutil;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
@@ -51,12 +50,10 @@ public class TranscodingConverterThread extends AbstractConverter {
             }
             recorder = JavaCvUtil.createRecorder(stream, grabber);
             recorder.setGopSize(50);
-            recorder.setAudioCodec(avcodec.AV_CODEC_ID_AAC);
-            recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
             recorder.start();
 
             if (super.getHeaders() == null) {
-                // rtsp流 头信息写入 转换器
+                // 头信息写入 转换器
                 super.setHeaders(stream.toByteArray());
                 stream.reset();
                 writeResponse(super.getOuts(), super.getHeaders());

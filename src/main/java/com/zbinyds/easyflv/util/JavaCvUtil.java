@@ -1,10 +1,9 @@
 package com.zbinyds.easyflv.util;
 
 import lombok.SneakyThrows;
+import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 
@@ -14,8 +13,7 @@ import java.io.ByteArrayOutputStream;
  * @Author zbinyds
  * @Create 2024-05-08 15:47
  */
-public class JavaCvUtil {
-    private static final Logger log = LoggerFactory.getLogger(JavaCvUtil.class);
+public abstract class JavaCvUtil {
 
     /**
      * 创建抓图器并运行。
@@ -24,19 +22,11 @@ public class JavaCvUtil {
      * @return {@link FFmpegFrameGrabber 抓图器}
      */
     public static FFmpegFrameGrabber createGrabber(String url) {
-        try {
-            FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(url);
-            grabber.setTimeout(5000);
-            grabber.setOption("rtsp_transport", "tcp");
-            grabber.setOption("stimeout", "5000000");
-            // 若有必要可以限制请求方式为POST，但对应的接口请求方式也必须是POST
-//            grabber.setOption("method", "POST");
-            grabber.start();
-            return grabber;
-        } catch (FFmpegFrameGrabber.Exception e) {
-            log.error("运行抓图器FFmpegFrameGrabber失败, error: {}", e.getMessage());
-            return null;
-        }
+        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(url);
+        grabber.setTimeout(5000);
+        grabber.setOption("rtsp_transport", "tcp");
+        grabber.setOption("stimeout", "5000000");
+        return grabber;
     }
 
     /**
@@ -50,22 +40,34 @@ public class JavaCvUtil {
     public static FFmpegFrameRecorder createRecorder(ByteArrayOutputStream stream, FFmpegFrameGrabber grabber) {
         FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(stream, grabber.getImageWidth(), grabber.getImageHeight(),
                 grabber.getAudioChannels());
+        // 设置交织模式，便于音视频同步播放
         recorder.setInterleaved(true);
         // 设置编码速度，以最快的速度编码
         recorder.setVideoOption("preset", "ultrafast");
         // 设置最小化延迟确保实时性
         recorder.setVideoOption("tune", "zerolatency");
-        // 设置视频编码质量，值越低质量越高，0表示无损
+        // 设置视频编码质量，值越低质量越高（0-51），0表示无损
+        // 这里使用vbr模式，禁用固定比特率（videoBit设为0），通过crf设置视频质量
         recorder.setVideoOption("crf", "20");
+        recorder.setVideoBitrate(0);
+
+        // 设置视频帧率，一般是内部通过计算得到平均帧率
         recorder.setFrameRate(grabber.getFrameRate());
-        recorder.setSampleRate(grabber.getSampleRate());
+        // 设置音频采样率为44100hz（仅支持44100，22050，11025）
+        recorder.setSampleRate(44100);
         if (grabber.getAudioChannels() > 0) {
+            // 如果原视频流有音频输出
+            // 设置音频通道为grabber音频通道（0-无音频 1-单声道 2-立体声...）
             recorder.setAudioChannels(grabber.getAudioChannels());
-            recorder.setAudioBitrate(grabber.getAudioBitrate());
+            // 设置音频比特率（64kbps-192kbps），这里强制设置为128kbps
+            recorder.setAudioBitrate(128000);
         }
         // 指定输出格式为flv
         recorder.setFormat("flv");
-        recorder.setVideoBitrate(grabber.getVideoBitrate());
+
+        // 设置视频解码器为H264、音频编解码器为AAC（这里可选MP3）
+        recorder.setAudioCodec(avcodec.AV_CODEC_ID_AAC);
+        recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
         return recorder;
     }
 }

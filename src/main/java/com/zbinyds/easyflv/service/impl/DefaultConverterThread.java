@@ -44,11 +44,9 @@ public class DefaultConverterThread extends AbstractConverter {
             log.info("url:[{}], key:[{}] DefaultConverterThread start", super.getUrl(), super.getKey());
             avutil.av_log_set_level(avutil.AV_LOG_ERROR);
             recorder = JavaCvUtil.createRecorder(stream, grabber);
-            recorder.setAudioCodec(grabber.getAudioCodec());
-            recorder.setVideoCodec(grabber.getVideoCodec());
             recorder.start(grabber.getFormatContext());
             if (super.getHeaders() == null) {
-                // rtsp流 头信息写入 转换器
+                // 头信息写入 转换器
                 super.setHeaders(stream.toByteArray());
                 stream.reset();
                 writeResponse(super.getOuts(), super.getHeaders());

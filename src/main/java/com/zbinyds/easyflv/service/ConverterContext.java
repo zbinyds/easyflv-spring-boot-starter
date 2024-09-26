@@ -4,13 +4,12 @@ import com.zbinyds.easyflv.service.impl.DefaultConverterThread;
 import com.zbinyds.easyflv.service.impl.TranscodingConverterThread;
 import com.zbinyds.easyflv.util.JavaCvUtil;
 import org.bytedeco.ffmpeg.global.avcodec;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.*;
 
 /**
@@ -57,28 +56,29 @@ public class ConverterContext {
      * @return 转换器
      */
     public static Converter generateAndRunning(String url, String key, AsyncContext context) {
-        return Optional.ofNullable(JavaCvUtil.createGrabber(url))
-                .map(grabber -> {
-                    try {
-                        if (avcodec.AV_CODEC_ID_H264 == grabber.getVideoCodec()
-                                && (grabber.getAudioChannels() == 0 || avcodec.AV_CODEC_ID_AAC == grabber.getAudioCodec())) {
-                            // 创建默认转换器，H264+AAC
-                            DefaultConverterThread defaultConverterThread = new DefaultConverterThread(key, url, context, grabber);
-                            log.info("DefaultConverterThread 创建成功");
-                            CONVERT_POOL.execute(defaultConverterThread);
-                            return defaultConverterThread;
-                        } else {
-                            // 创建转码转换器，需要转码为H264+AAC
-                            TranscodingConverterThread transcodingConverterThread = new TranscodingConverterThread(key, url, context, grabber);
-                            log.info("TranscodingConverterThread 创建成功");
-                            CONVERT_POOL.execute(transcodingConverterThread);
-                            return transcodingConverterThread;
-                        }
-                    } catch (RejectedExecutionException e) {
-                        // 线程池执行失败, 兜底返回null客户端直接失败无需等待
-                        log.error("线程池已达上限拒绝执行, msg: {}", e.getMessage(), e);
-                        return null;
-                    }
-                }).orElse(null);
+        FFmpegFrameGrabber grabber = JavaCvUtil.createGrabber(url);
+        try {
+            grabber.start();
+
+            if (avcodec.AV_CODEC_ID_H264 == grabber.getVideoCodec()
+                    && (grabber.getAudioChannels() == 0 || avcodec.AV_CODEC_ID_AAC == grabber.getAudioCodec())) {
+                // 创建默认转换器，H264+AAC/无音频
+                DefaultConverterThread defaultConverterThread = new DefaultConverterThread(key, url, context, grabber);
+                CONVERT_POOL.execute(defaultConverterThread);
+                return defaultConverterThread;
+            } else {
+                // 创建转码转换器，需要转码为H264+AAC
+                TranscodingConverterThread transcodingConverterThread = new TranscodingConverterThread(key, url, context, grabber);
+                CONVERT_POOL.execute(transcodingConverterThread);
+                return transcodingConverterThread;
+            }
+        } catch (FFmpegFrameGrabber.Exception e) {
+            log.error("运行抓图器FFmpegFrameGrabber失败, error: {}", e.getMessage(), e);
+            return null;
+        } catch (RejectedExecutionException e) {
+            // 线程池执行失败, 兜底返回null客户端直接失败无需等待
+            log.error("线程池已达上限拒绝执行, msg: {}", e.getMessage(), e);
+            return null;
+        }
     }
 }
