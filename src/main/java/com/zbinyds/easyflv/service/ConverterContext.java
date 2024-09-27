@@ -18,16 +18,16 @@ import java.util.concurrent.*;
  * @Author zbinyds
  * @Create 2024-05-08 14:38
  */
-public class ConverterContext {
+public final class ConverterContext {
     private static final Logger log = LoggerFactory.getLogger(ConverterContext.class);
-    private static final Map<String, Converter> CONVERTER_BUFFER = new ConcurrentHashMap<>(128);
-    private static final ThreadPoolExecutor CONVERT_POOL = new ThreadPoolExecutor(
-            1,
-            1,
+    private static final Map<String, Converter> CONVERTER_BUFFER = new ConcurrentHashMap<>(2 << 6);
+    private static final ThreadPoolExecutor CONVERT_POOL = new ThreadPoolExecutorMonitor(
+            10,
+            10,
             0,
             TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(1),
-            Executors.defaultThreadFactory(),
+            new LinkedBlockingQueue<>(2 << 6),
+            ThreadPoolExecutorMonitor.monitorThreadFactory("flv"),
             new ThreadPoolExecutor.AbortPolicy()
     );
 
