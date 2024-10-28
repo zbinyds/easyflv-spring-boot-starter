@@ -56,8 +56,8 @@ public final class ConverterContext {
      * @return 转换器
      */
     public static Converter generateAndRunning(String url, String key, AsyncContext context) {
-        FFmpegFrameGrabber grabber = JavaCvUtil.createGrabber(url);
         try {
+            FFmpegFrameGrabber grabber = JavaCvUtil.createGrabber(url);
             grabber.start();
 
             if (avcodec.AV_CODEC_ID_H264 == grabber.getVideoCodec()
@@ -78,6 +78,10 @@ public final class ConverterContext {
         } catch (RejectedExecutionException e) {
             // 线程池执行失败, 兜底返回null客户端直接失败无需等待
             log.error("线程池已达上限拒绝执行, msg: {}", e.getMessage(), e);
+            return null;
+        } catch (Exception e) {
+            // 未知
+            log.error("未知异常", e);
             return null;
         }
     }

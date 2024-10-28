@@ -26,6 +26,7 @@ public abstract class JavaCvUtil {
         grabber.setTimeout(5000);
         grabber.setOption("rtsp_transport", "tcp");
         grabber.setOption("stimeout", "5000000");
+        grabber.setOption("rw_timeout", "5000000");
         return grabber;
     }
 
