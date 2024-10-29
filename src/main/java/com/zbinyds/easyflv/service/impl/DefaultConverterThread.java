@@ -71,10 +71,11 @@ public class DefaultConverterThread extends AbstractConverter {
                     }
                     avcodec.av_packet_unref(k);
                 } else {
-                    // 抓包失败次数达200次不等待默认退出
+                    // 抓包失败次数达50次不等待默认退出
                     nullNumber++;
-                    if (nullNumber > 200) {
-                        log.info("抓包失败达{}次上限, 可能由于网络波动", nullNumber);
+                    log.info("抓包第{}次失败, 正在重新尝试转码", nullNumber);
+                    if (nullNumber > 50) {
+                        log.info("抓包失败达50次上限, 可能由于网络波动, 转码器停止转码");
                         break;
                     }
                 }
